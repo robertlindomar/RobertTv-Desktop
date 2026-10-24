@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1450" height="370" viewBox="0 0 1450 370" role="img" aria-labelledby="ttl desc">
+<title id="ttl">Robert TV — logotipo para tema claro</title>
+<desc id="desc">Marca vetorial em fundo transparente. Simbolo curvilineo pastel, nome Robert e letras TV em degrade.</desc>
+<defs>
+<!-- Gradientes vetoriais do simbolo (nenhuma imagem incorporada) -->
+<linearGradient id="gradBack" x1="485" y1="157" x2="518" y2="477" gradientUnits="userSpaceOnUse">
+ <stop stop-color="#80EDFF"/><stop offset=".40" stop-color="#50B9F9"/><stop offset=".78" stop-color="#5864F3"/><stop offset="1" stop-color="#704BE9"/>
+</linearGradient>
+<linearGradient id="gradBottom" x1="154" y1="418" x2="319" y2="634" gradientUnits="userSpaceOnUse">
+ <stop stop-color="#FE76AC"/><stop offset=".27" stop-color="#FF97AD"/><stop offset=".64" stop-color="#FFBAC0"/><stop offset="1" stop-color="#FFE9B4"/>
+</linearGradient>
+<linearGradient id="gradTop" x1="150" y1="0" x2="377" y2="363" gradientUnits="userSpaceOnUse">
+ <stop stop-color="#72F4FF"/><stop offset=".22" stop-color="#28B9FA"/><stop offset=".56" stop-color="#206DFD"/><stop offset=".80" stop-color="#2839D9"/><stop offset="1" stop-color="#5442F7"/>
+</linearGradient>
+<linearGradient id="gradFront" x1="8" y1="135" x2="442" y2="585" gradientUnits="userSpaceOnUse">
+ <stop stop-color="#7DF3FF"/><stop offset=".25" stop-color="#56D1F9"/><stop offset=".49" stop-color="#789CF7"/><stop offset=".72" stop-color="#CF9CF9"/><stop offset=".84" stop-color="#FDBBCF"/><stop offset="1" stop-color="#8E82FA"/>
+</linearGradient>
+<linearGradient id="gradTv" x1="0" y1="0" x2="2880" y2="0" gradientUnits="userSpaceOnUse">
+ <stop stop-color="#6CD9F8"/><stop offset=".23" stop-color="#8CAAFB"/><stop offset=".51" stop-color="#BA93FB"/><stop offset=".73" stop-color="#EAA0DE"/><stop offset="1" stop-color="#FFC39B"/>
+</linearGradient>
+</defs>
+
+<g id="simbolo-robert-tv" transform="translate(16 18) scale(.51)">
+  <path id="camada-tras" fill="url(#gradBack)" d="M 474,148 C 536,171 593,236 607,303 C 627,385 591,428 531,461 L 475,481 C 412,445 359,412 301,381 C 386,360 458,326 495,276 C 526,231 521,185 474,148 Z"/>
+  <path id="camada-inferior" fill="url(#gradBottom)" d="M 302,380 C 234,397 162,432 122,488 C 85,537 85,602 126,630 C 153,650 206,628 240,609 L 477,477 C 422,444 369,410 302,380 Z"/>
+  <path id="camada-superior" fill="url(#gradTop)" d="M 32,95 C 36,56 59,21 97,5 C 127,-9 160,7 201,29 L 486,158 C 516,172 530,204 523,241 C 516,295 449,353 302,382 C 358,362 397,344 406,310 C 419,265 386,231 338,201 C 239,143 135,105 32,95 Z"/>
+  <path id="camada-frontal" fill="url(#gradFront)" d="M 32,95 C 192,113 322,171 382,231 C 408,257 417,282 406,312 C 391,350 349,364 284,381 C 208,401 143,442 111,498 C 79,553 85,607 126,631 C 62,619 31,569 31,511 L 31,132 Z"/>
+  <!-- Discretas separacoes luminosas vistas no simbolo de referencia -->
+  <path d="M 32,95 C 192,113 322,171 382,231 C 408,257 417,282 406,312 C 391,350 349,364 284,381" fill="none" stroke="#E6FAFF" stroke-width="3.3" stroke-opacity=".9" />
+  <path d="M 301,381 C 223,396 156,433 118,493 C 89,542 88,600 126,631" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-opacity=".82"/>
+</g>
+
+<g id="logotipo-tipografia" transform="translate(390 264) scale(0.1025390625 -0.1025390625)" fill="#20242F">
+ <path d="M80 0H496V466H682L905 0H1338L1065 556C1210 642 1292 785 1292 970C1292 1289 1069 1490 713 1490H80ZM496 788V1152H682C807 1152 886 1079 886 970C886 861 807 788 682 788Z"/>
+<path d="M1985 -24C2329 -24 2561 190 2561 528C2561 865 2329 1080 1985 1080C1642 1080 1409 865 1409 528C1409 189 1642 -24 1985 -24ZM1985 288C1890 288 1813 369 1813 528C1813 687 1890 768 1985 768C2080 768 2157 687 2157 528C2157 369 2080 288 1985 288Z"/>
+<path d="M3385 -24C3662 -24 3841 194 3841 530C3841 853 3654 1080 3389 1080C3252 1080 3161 1029 3094 918H3093V1490H2693V0H3089V164H3090C3138 40 3245 -24 3385 -24ZM3266 290C3157 290 3079 384 3079 530C3079 675 3157 768 3266 768C3375 768 3437 675 3437 530C3437 384 3375 290 3266 290Z"/>
+<path d="M4494 -24C4772 -24 4996 129 5035 345H4681C4659 288 4595 254 4510 254C4394 254 4324 320 4321 432H5039V539C5039 856 4810 1080 4486 1080C4162 1080 3933 851 3933 528C3933 205 4165 -24 4494 -24ZM4324 656C4338 743 4400 794 4497 794C4594 794 4656 743 4670 656Z"/>
+<path d="M5167 0H5567V506C5567 647 5646 736 5771 736H5917V1056H5817C5672 1056 5595 1006 5557 864H5555V1056H5167Z"/>
+<path d="M6749 1056H6531V1344H6131V1056H5953V752H6131V316C6131 96 6252 0 6529 0H6749V304H6623C6550 304 6531 323 6531 386V752H6749Z"/>
+</g>
+<g id="televisao-tv" transform="translate(1126 264) scale(0.1025390625 -0.1025390625)" fill="url(#gradTv)">
+ <path d="M40 1138H464V0H880V1138H1304V1490H40Z"/>
+<path d="M1844 0H2396L2880 1490H2428L2263 912C2213 738 2167 565 2122 391C2075 565 2027 738 1975 912L1802 1490H1344Z"/>
+</g>
+</svg>

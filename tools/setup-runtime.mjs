@@ -1,0 +1,27 @@
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const version='44.9.3+wvcus';
+const platform=process.argv.includes('--windows')?'win32':process.platform;
+if(!['linux','win32'].includes(platform)||process.arch!=='x64')throw Error('Este pacote suporta Linux e Windows x64.');
+const destination=path.join(root,'.browser',platform==='win32'?'ecs-windows':'ecs');
+const cache=path.join(root,'.cache');await mkdir(cache,{recursive:true});
+const name=`electron-v${version}-${platform}-x64.zip`;
+const base=`https://github.com/castlabs/electron-releases/releases/download/v${encodeURIComponent(version)}/`;
+async function download(url){const r=await fetch(url);if(!r.ok)throw Error(`Download falhou: HTTP ${r.status}`);return Buffer.from(await r.arrayBuffer());}
+console.log('Baixando Electron for Content Security:',platform,version);
+const sums=(await download(base+'SHASUMS256.txt')).toString();
+const expected=sums.split('\n').find(line=>line.trim().endsWith(name))?.split(/\s+/)[0];
+if(!expected)throw Error('Checksum não encontrado para '+name);
+const bytes=await download(base+encodeURIComponent(name));
+const actual=createHash('sha256').update(bytes).digest('hex');
+if(actual!==expected)throw Error('Checksum não confere; o motor não será executado.');
+const archive=path.join(cache,name);await writeFile(archive,bytes);
+await mkdir(destination,{recursive:true});
+execFileSync(process.platform==='win32'?'python':'python3',['-c','import zipfile,sys; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])',archive,destination],{stdio:'inherit'});
+if(platform==='linux')execFileSync('chmod',['+x',path.join(destination,'electron'),path.join(destination,'chrome_crashpad_handler'),path.join(destination,'chrome-sandbox')]);
+await writeFile(path.join(destination,'ROBERTTV-RUNTIME.json'),JSON.stringify({version,platform,sha256:actual,source:base},null,2));
+console.log('Motor verificado e preparado em',destination);

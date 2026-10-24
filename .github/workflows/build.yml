@@ -1,0 +1,83 @@
+name: Build Linux e Windows
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: linux
+          - os: windows-2022
+            target: windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Conferir JavaScript
+        run: node --check desktop/main.cjs
+      - name: Preparar motor com checksum
+        run: npm run runtime:install
+      - name: Criar pacote
+        run: python tools/package.py ${{ matrix.target }}
+      - name: Verificar pacote Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo chown root:root dist/RobertTV-Desktop-0.1.0-linux-x64/chrome-sandbox
+          sudo chmod 4755 dist/RobertTV-Desktop-0.1.0-linux-x64/chrome-sandbox
+          timeout 150 xvfb-run -a dist/RobertTV-Desktop-0.1.0-linux-x64/RobertTV --smoke-test
+      - name: Verificar pacote Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $exe = (Resolve-Path 'dist/RobertTV-Desktop-0.1.0-windows-x64/RobertTV.exe').Path
+          $p = Start-Process -FilePath $exe -ArgumentList '--smoke-test' -PassThru -RedirectStandardOutput smoke.log -RedirectStandardError smoke-errors.log
+          if (-not $p.WaitForExit(150000)) { $p.Kill(); throw 'Tempo excedido ao iniciar o pacote' }
+          Get-Content smoke.log
+          Get-Content smoke-errors.log
+          if ($p.ExitCode -ne 0) { throw "Falha ao iniciar: $($p.ExitCode)" }
+          if (-not (Select-String -Path smoke.log -SimpleMatch '[SMOKE OK]' -Quiet)) { throw 'Verificação não foi concluída' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RobertTV-${{ matrix.target }}
+          path: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/*.sha256
+          if-no-files-found: error
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Publicar prévia
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --prerelease --title "RobertTV Desktop $TAG — prévia pública" --notes-file RELEASE-NOTES.md
+          fi
+          gh release upload "$TAG" artifacts/* --clobber

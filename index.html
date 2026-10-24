@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#efedf0"><title>Robert TV — PC</title><link rel="icon" href="assets/logo-light.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css"></head>
+<body>
+<svg class="symbols" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z"/></symbol>
+<symbol id="phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4"/></symbol>
+<symbol id="settings" viewBox="0 0 24 24"><path d="m10 3-.6 2.3-2 .9-2.2-.7-2 3.5 1.7 1.6v2.8L3.2 15l2 3.5 2.2-.7 2 .9.6 2.3h4l.6-2.3 2-.9 2.2.7 2-3.5-1.7-1.6v-2.8l1.7-1.6-2-3.5-2.2.7-2-.9L14 3Z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="full" viewBox="0 0 24 24"><path d="M3 9V3h6m6 0h6v6m0 6v6h-6m-6 0H3v-6"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="m10 5-7 7 7 7m-7-7h17"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3Z"/></symbol>
+</defs></svg>
+<div class="ambient" aria-hidden="true"></div>
+<main id="stage">
+<header><img class="logo logo-light" src="assets/logo-light.svg" alt="Robert TV"><img class="logo logo-dark" src="assets/logo.svg" alt="Robert TV"><div class="tools"><button class="round" data-action="youtube" aria-label="Abrir YouTube" title="YouTube"><span class="youtube-symbol"><svg><use href="#play"/></svg></span></button><button class="round" data-action="full" aria-label="Tela cheia" title="Tela cheia"><svg><use href="#full"/></svg></button><button class="round" data-action="settings" aria-label="Configurações" title="Configurações"><svg><use href="#settings"/></svg></button></div></header>
+<section id="clock" aria-label="Horário e data"><time id="clock-time"></time><p id="clock-date"></p></section>
+<section class="shelf" aria-label="Aplicativos de streaming" id="app-grid"></section>
+</main>
+<dialog id="modal"><div class="dialog-header"><span>Robert TV <small>PC</small></span><button class="close" aria-label="Fechar">×</button></div><div id="modal-content"></div></dialog><div id="toast" role="status"></div>
+<script src="app.js"></script>
+</body></html>

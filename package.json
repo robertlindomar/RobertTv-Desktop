@@ -1,0 +1,26 @@
+{
+  "name": "roberttv-pc",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Central de streaming desktop para Linux e Windows",
+  "scripts": {
+    "start": "node server.mjs",
+    "desktop": "node tools/start.mjs",
+    "desktop:netflix": "node tools/start.mjs --netflix",
+    "desktop:diagnose": "node tools/start.mjs --diagnose-netflix",
+    "desktop:drm": "node tools/start.mjs",
+    "desktop:drm:diagnose": "node tools/start.mjs --diagnose-netflix",
+    "runtime:install": "node tools/setup-runtime.mjs",
+    "package:linux": "python tools/package.py linux",
+    "package:windows": "python tools/package.py windows"
+  },
+  "main": "desktop/main.cjs",
+  "productName": "RobertTV Desktop",
+  "author": "Robert Lindomar",
+  "license": "MIT",
+  "homepage": "https://github.com/robertlindomar/RobertTv-Desktop",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robertlindomar/RobertTv-Desktop.git"
+  }
+}
