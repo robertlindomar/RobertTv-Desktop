@@ -39,7 +39,13 @@ function createRemoteActions({getView,getPage,openService,home,fullscreen,servic
    case 'pointer':{
     const b=view.getBounds();point.x=Math.max(1,Math.min(b.width-2,point.x+c.dx*1.7));point.y=Math.max(1,Math.min(b.height-2,point.y+c.dy*1.7));point.x=Math.round(point.x);point.y=Math.round(point.y);
     wc.sendInputEvent({type:'mouseMove',x:point.x,y:point.y});
-    await wc.executeJavaScript(`(()=>{let p=document.getElementById('__robertRemotePointer');if(!p){p=document.createElement('div');p.id='__robertRemotePointer';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;width:15px;height:15px;border:2px solid white;border-radius:50%;background:#9d8be0;box-shadow:0 1px 5px #0009;pointer-events:none;z-index:2147483647;transform:translate(-50%,-50%)';(document.fullscreenElement?.tagName!=='VIDEO'&&document.fullscreenElement||document.documentElement).appendChild(p);}p.style.left='${point.x}px';p.style.top='${point.y}px';})()`).catch(()=>{});break;
+    await wc.executeJavaScript(`(()=>{
+     let p=document.getElementById('__robertRemotePointer');
+     if(!p){p=document.createElement('div');p.id='__robertRemotePointer';p.setAttribute('aria-hidden','true');p.setAttribute('popover','manual');p.style.cssText='position:fixed;inset:auto;margin:0;padding:0;width:15px;height:15px;border:2px solid white;border-radius:50%;background:#9d8be0;box-shadow:0 1px 5px #0009;pointer-events:none;z-index:2147483647;transform:translate(-50%,-50%)';}
+     const layer=document.querySelector('dialog[open]')||(document.fullscreenElement?.tagName!=='VIDEO'&&document.fullscreenElement)||document.documentElement;
+     if(p.parentElement!==layer){if(p.matches(':popover-open'))p.hidePopover();layer.appendChild(p);}
+     p.style.left='${point.x}px';p.style.top='${point.y}px';if(!p.matches(':popover-open'))p.showPopover();
+    })()`).catch(()=>{});break;
    }
    case 'click':wc.focus();wc.sendInputEvent({type:'mouseDown',x:point.x,y:point.y,button:'left',clickCount:1});wc.sendInputEvent({type:'mouseUp',x:point.x,y:point.y,button:'left',clickCount:1});break;
    case 'scroll':wc.sendInputEvent({type:'mouseWheel',x:point.x,y:point.y,deltaX:0,deltaY:-Math.round(c.dy),canScroll:true});break;

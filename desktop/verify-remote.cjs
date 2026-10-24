@@ -24,6 +24,21 @@ module.exports=async({win,homeView,remoteInfo,getRemote})=>{
  await mobile.executeJavaScript('document.querySelector("#tab-touch").click()');await mobile.executeJavaScript('command({type:"pointer",dx:30,dy:20})');
  await until(()=>home.executeJavaScript('!!document.querySelector("#__robertRemotePointer")'));
  console.log('[Controle] Cursor do touchpad apareceu na janela do aplicativo.');
+ await home.executeJavaScript('document.querySelector("[data-action=settings]").click()');
+ const switchPoint=await home.executeJavaScript('(()=>{const r=document.querySelector(".theme-switch").getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2};})()');
+ let cursor={x:171,y:154};
+ async function moveTo(target){while(Math.abs(cursor.x-target.x)>2||Math.abs(cursor.y-target.y)>2){const dx=Math.max(-300,Math.min(300,(target.x-cursor.x)/1.7)),dy=Math.max(-300,Math.min(300,(target.y-cursor.y)/1.7));await mobile.executeJavaScript(`command({type:'pointer',dx:${dx},dy:${dy}})`);cursor={x:Math.round(cursor.x+dx*1.7),y:Math.round(cursor.y+dy*1.7)};}}
+ await moveTo(switchPoint);
+ const pointer=await home.executeJavaScript('(()=>{const p=document.querySelector("#__robertRemotePointer"),r=p.getBoundingClientRect();return{topLayer:p.matches(":popover-open"),insideDialog:!!p.closest("dialog[open]"),x:r.x+r.width/2,y:r.y+r.height/2};})()');
+ assert.equal(pointer.topLayer,true);assert.equal(pointer.insideDialog,true);assert.ok(Math.abs(pointer.x-switchPoint.x)<3);assert.ok(Math.abs(pointer.y-switchPoint.y)<3);
+ const before=await home.executeJavaScript('document.body.classList.contains("dark")');
+ await mobile.executeJavaScript('command({type:"click"})');await pause(150);
+ assert.notEqual(await home.executeJavaScript('document.body.classList.contains("dark")'),before);
+ const closePoint=await home.executeJavaScript('(()=>{const r=document.querySelector(".close").getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2};})()');
+ await moveTo(closePoint);await mobile.executeJavaScript('command({type:"click"})');await pause(150);
+ assert.equal(await home.executeJavaScript('document.querySelector("#modal").open'),false);
+ console.log('[Controle] Cursor visível sobre a modal, interruptor e fechar funcionaram pelo touchpad.');
+
  await home.executeJavaScript('const field=document.createElement("input");field.id="qaRemoteInput";field.style.cssText="position:fixed;top:90px;left:200px;z-index:999";document.body.appendChild(field);field.focus()');
  await mobile.executeJavaScript('command({type:"text",text:"RobertTV"})');
  assert.equal(await home.executeJavaScript('document.querySelector("#qaRemoteInput").value'),'RobertTV');
