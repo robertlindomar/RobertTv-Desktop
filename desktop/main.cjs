@@ -1,4 +1,4 @@
-const {app,BrowserWindow,WebContentsView,ipcMain,session,components,dialog}=require('electron');
+const {app,BrowserWindow,WebContentsView,ipcMain,session,components,dialog,shell}=require('electron');
 const path=require('node:path');
 const fs=require('node:fs');
 const {pathToFileURL}=require('node:url');
@@ -52,6 +52,7 @@ app.whenReady().then(async()=>{
   controls=new WebContentsView({webPreferences:{preload:path.join(__dirname,'preload.cjs'),nodeIntegration:false,contextIsolation:true,sandbox:true}});controls.setBackgroundColor('#00000000');shortcuts(controls.webContents);
   await controls.webContents.loadFile(path.join(__dirname,'toolbar.html'));
   controls.setVisible(false);win.contentView.addChildView(controls);
+  ipcMain.handle('home:about-link',async(event,key)=>{if(event.sender!==homeView.webContents||event.senderFrame?.url!==homeURL)throw Error('Origem inválida');const links={author:'https://robertlindomar.com.br',source:'https://github.com/robertlindomar/RobertTv-Desktop'};if(!Object.hasOwn(links,key))throw Error('Link inválido');await shell.openExternal(links[key]);});
   ipcMain.handle('home:service',async(event,id,url)=>{if(event.sender!==homeView.webContents||event.senderFrame?.url!==homeURL)throw Error('Origem inválida');return openService(id,url);});
   ipcMain.handle('control',async(event,command)=>{if(event.sender!==controls.webContents||event.senderFrame?.url!==controlsURL)return;if(command==='home')return home();if(command==='back'){if(content.webContents.navigationHistory.canGoBack())content.webContents.navigationHistory.goBack();else return home();}if(command==='reload')content.webContents.reload();if(command==='full')win.setFullScreen(!win.isFullScreen());if(command==='reveal')reveal(true);if(command==='hide')revealTimer=setTimeout(()=>reveal(false),700);});
   homeView.webContents.setWindowOpenHandler(({url})=>{const id=serviceForURL(url);if(id)openService(id,url).catch(console.error);return{action:'deny'};});

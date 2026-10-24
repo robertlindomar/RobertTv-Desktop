@@ -37,14 +37,16 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          sudo chown root:root dist/RobertTV-Desktop-0.1.0-linux-x64/chrome-sandbox
-          sudo chmod 4755 dist/RobertTV-Desktop-0.1.0-linux-x64/chrome-sandbox
-          timeout 150 xvfb-run -a dist/RobertTV-Desktop-0.1.0-linux-x64/RobertTV --smoke-test
+          package_dir="$(find dist -maxdepth 1 -type d -name 'RobertTV-Desktop-*-linux-x64' -print -quit)"
+          sudo chown root:root "$package_dir/chrome-sandbox"
+          sudo chmod 4755 "$package_dir/chrome-sandbox"
+          timeout 150 xvfb-run -a "$package_dir/RobertTV" --smoke-test
       - name: Verificar pacote Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $exe = (Resolve-Path 'dist/RobertTV-Desktop-0.1.0-windows-x64/RobertTV.exe').Path
+          $packageDir = Get-ChildItem dist -Directory -Filter 'RobertTV-Desktop-*-windows-x64' | Select-Object -First 1
+          $exe = Join-Path $packageDir.FullName 'RobertTV.exe'
           $p = Start-Process -FilePath $exe -ArgumentList '--smoke-test' -PassThru -RedirectStandardOutput smoke.log -RedirectStandardError smoke-errors.log
           if (-not $p.WaitForExit(150000)) { $p.Kill(); throw 'Tempo excedido ao iniciar o pacote' }
           Get-Content smoke.log

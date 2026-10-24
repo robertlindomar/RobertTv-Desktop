@@ -1,6 +1,6 @@
 # RobertTV Desktop
 
-Uma central de streaming para o seu computador, com relógio, data e os seus serviços em uma única janela. Interface em português, temas claro e escuro e navegação por teclado.
+Uma central de streaming para o seu computador, com relógio, data e os seus serviços em uma única janela. Interface em português, temas claro e escuro e navegação por teclado. Feito por [Robert Lindomar](https://robertlindomar.com.br).
 
 ![Tela inicial do RobertTV](docs/tela-inicial.png)
 
@@ -10,8 +10,8 @@ Os downloads ficam em **[Releases](https://github.com/robertlindomar/RobertTv-De
 
 | Sistema | Pacote | Estado |
 | --- | --- | --- |
-| Linux x64 | `RobertTV-Desktop-0.1.0-linux-x64.tar.gz` | Sete serviços testados pelo autor em Omarchy/Arch Linux |
-| Windows x64 | `RobertTV-Desktop-0.1.0-windows-x64.zip` | Experimental; sem validação de reprodução no Windows e sem assinatura VMP de produção |
+| Linux x64 | `RobertTV-Desktop-0.1.1-linux-x64.tar.gz` | Sete serviços testados pelo autor em Omarchy/Arch Linux |
+| Windows x64 | `RobertTV-Desktop-0.1.1-windows-x64.zip` | Experimental; sem validação de reprodução no Windows e sem assinatura VMP de produção |
 
 ### Linux
 
