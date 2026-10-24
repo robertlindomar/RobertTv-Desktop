@@ -1,6 +1,6 @@
 {
   "name": "roberttv-pc",
-  "version": "0.1.1",
+  "version": "0.2.0-beta.1",
   "private": true,
   "description": "Central de streaming desktop para Linux e Windows",
   "scripts": {
@@ -12,7 +12,8 @@
     "desktop:drm:diagnose": "node tools/start.mjs --diagnose-netflix",
     "runtime:install": "node tools/setup-runtime.mjs",
     "package:linux": "python tools/package.py linux",
-    "package:windows": "python tools/package.py windows"
+    "package:windows": "python tools/package.py windows",
+    "test": "node --test desktop/remote-server.test.cjs"
   },
   "main": "desktop/main.cjs",
   "productName": "RobertTV Desktop",

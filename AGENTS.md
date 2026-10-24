@@ -12,7 +12,7 @@ Comece com uma consulta específica de até três resultados, sem síntese por L
 
 - O motor necessário é Castlabs Electron for Content Security com Widevine. Não o substitua pelo Electron padrão: o primeiro teste de Netflix falhou por ausência de Widevine; o ECS foi validado pelo usuário no Linux.
 - Os sete serviços usam WebContentsView, sessões persistentes separadas, sandbox e isolamento de contexto. Não habilite Node.js em conteúdo remoto nem desative a segurança web.
-- A interface tem relógio/data, sete atalhos, tema claro/escuro persistido e Sobre. O controle pelo celular está adiado.
+- A interface tem relógio/data, sete atalhos, tema claro/escuro persistido e Sobre. O controle pelo celular funciona por rede local, ativado nas configurações, com código temporário e confirmação no computador. Não expor à internet nem implementar comandos de shell via controle.
 - Execute `npm run desktop` para desenvolver; `npm run runtime:install` prepara o motor verificado. `tools/package.py` gera os pacotes a partir de uma lista explícita de arquivos.
 - Os workflows verificam a inicialização no Linux e Windows. Isso não comprova reprodução dos serviços com DRM no Windows; mantenha a indicação experimental e a pendência de assinatura VMP de produção.
 

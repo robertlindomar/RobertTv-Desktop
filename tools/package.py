@@ -14,7 +14,7 @@ runtime=ROOT/'.browser'/('ecs' if TARGET=='linux' else 'ecs-windows')
 if not runtime.exists():raise SystemExit('Prepare o motor com npm run runtime:install (ou -- --windows).')
 shutil.copytree(runtime,stage,dirs_exist_ok=True,ignore=shutil.ignore_patterns('ROBERTTV-RUNTIME.json'))
 app=stage/'resources/app';app.mkdir(parents=True,exist_ok=True)
-files=['index.html','app.js','style.css','LICENSE','ASSET-CREDITS.md','desktop/main.cjs','desktop/services.cjs','desktop/home-preload.cjs','desktop/preload.cjs','desktop/toolbar.html','desktop/toolbar.css','desktop/toolbar.js']
+files=['index.html','app.js','style.css','LICENSE','ASSET-CREDITS.md','desktop/main.cjs','desktop/services.cjs','desktop/home-preload.cjs','desktop/preload.cjs','desktop/toolbar.html','desktop/toolbar.css','desktop/toolbar.js','desktop/remote-server.cjs','desktop/remote-actions.cjs','remote/index.html','remote/remote.css','remote/remote.js','vendor/qrcode.cjs','vendor/qrcode-LICENSE.txt']
 assets=['InterVariable.ttf','Inter-LICENSE.txt','app-icon.png','logo-light.svg','logo.svg','netflix.svg','youtube.png','prime.png','disneyplus.svg','hbomax.svg','paramountplus.svg','globoplay.svg']
 files += ['assets/'+asset for asset in assets]
 for rel in files:

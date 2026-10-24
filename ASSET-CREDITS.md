@@ -10,3 +10,5 @@ A interface desktop deriva do RobertTV / Free My TV, licenciado sob MIT. A licen
 - Castlabs Electron for Content Security: https://github.com/castlabs/electron-releases, versão 44.9.3+wvcus.
 
 O Widevine não acompanha este repositório nem os pacotes: o motor obtém o componente no primeiro uso por seu mecanismo de atualização. A disponibilidade e as regras de reprodução são definidas por Google Widevine e por cada provedor de streaming.
+
+- QR Code: qrcode-generator, de Kazuhiko Arase, MIT. Código e licença vendorizados em vendor/ para funcionar sem serviço externo.

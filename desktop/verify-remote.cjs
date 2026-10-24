@@ -1,0 +1,46 @@
+const {BrowserWindow,WebContentsView}=require('electron');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const pause=ms=>new Promise(r=>setTimeout(r,ms));
+async function until(check){const end=Date.now()+15000;while(Date.now()<end){if(await check())return;await pause(80);}throw Error('Tempo excedido no teste do controle');}
+module.exports=async({win,homeView,remoteInfo,getRemote})=>{
+ const home=homeView.webContents;
+ await home.executeJavaScript('document.querySelector("[data-action=settings]").click();document.querySelector("[data-action=remote]").click()');
+ await until(()=>home.executeJavaScript('!!document.querySelector("[data-action=remote-start]")'));
+ await home.executeJavaScript('document.querySelector("[data-action=remote-start]").click()');
+ await until(()=>getRemote()?.info().enabled);
+ const info=remoteInfo();assert.ok(info.qr.startsWith('data:image/'));assert.equal(info.address,'127.0.0.1');
+ const phone=new BrowserWindow({width:390,height:844,show:true,webPreferences:{nodeIntegration:false,contextIsolation:true,sandbox:true,partition:'remote-qa-'+Date.now()}});
+ const mobile=phone.webContents;await phone.loadURL(info.url);assert.equal(await mobile.executeJavaScript('document.documentElement.scrollWidth<=innerWidth'),true);
+ await mobile.executeJavaScript(`document.querySelector('#pair-code').value=${JSON.stringify(info.code)};document.querySelector('#device-name').value='Celular de teste';document.querySelector('#pair-form').requestSubmit()`);
+ await until(()=>mobile.executeJavaScript('!document.querySelector("#control-screen").hidden'));
+ assert.equal(getRemote().info().connected,true);console.log('[Controle] Pareamento real da interface móvel passou.');
+ await mobile.executeJavaScript('document.querySelector("[data-command=home]").click()');
+ await until(()=>home.executeJavaScript('!document.querySelector("#modal").open'));
+ await mobile.executeJavaScript('command({type:"key",key:"ArrowDown"})');await pause(250);
+ const focused=await home.executeJavaScript('document.activeElement.classList.contains("app")');if(!focused)console.log('[Foco QA]',await mobile.executeJavaScript('document.querySelector("#command-state").textContent'),await home.executeJavaScript('JSON.stringify({tag:document.activeElement.tagName,classe:document.activeElement.className})'));assert.equal(focused,true);
+ console.log('[Controle] Início e navegação pelo celular executados no RobertTV.');
+ await mobile.executeJavaScript('document.querySelector("#tab-touch").click()');await mobile.executeJavaScript('command({type:"pointer",dx:30,dy:20})');
+ await until(()=>home.executeJavaScript('!!document.querySelector("#__robertRemotePointer")'));
+ console.log('[Controle] Cursor do touchpad apareceu na janela do aplicativo.');
+ await home.executeJavaScript('const field=document.createElement("input");field.id="qaRemoteInput";field.style.cssText="position:fixed;top:90px;left:200px;z-index:999";document.body.appendChild(field);field.focus()');
+ await mobile.executeJavaScript('command({type:"text",text:"RobertTV"})');
+ assert.equal(await home.executeJavaScript('document.querySelector("#qaRemoteInput").value'),'RobertTV');
+ await mobile.executeJavaScript('command({type:"key",key:"Backspace"})');await pause(150);
+ assert.equal(await home.executeJavaScript('document.querySelector("#qaRemoteInput").value'),'RobertT');
+ console.log('[Controle] Texto e apagar funcionaram no campo de teste.');
+ const wav=Buffer.alloc(44+64000,128);wav.write('RIFF');wav.writeUInt32LE(wav.length-8,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(8000,24);wav.writeUInt32LE(8000,28);wav.writeUInt16LE(1,32);wav.writeUInt16LE(8,34);wav.write('data',36);wav.writeUInt32LE(64000,40);
+ await home.executeJavaScript(`new Promise((resolve,reject)=>{const m=document.createElement('audio');m.id='qaMedia';m.addEventListener('loadedmetadata',resolve,{once:true});m.addEventListener('error',reject,{once:true});m.src='data:audio/wav;base64,${wav.toString('base64')}';document.body.appendChild(m);m.load();})`);
+ const mediaActions=require('./remote-actions.cjs').createRemoteActions({getView:()=>homeView,getPage:()=> 'youtube',services:{youtube:{name:'Teste'}},openService:async()=>{},home:async()=>{},fullscreen:async()=>{}});
+ await mediaActions.command({type:'play'});assert.equal(await home.executeJavaScript('document.querySelector("#qaMedia").paused'),false);
+ await mediaActions.command({type:'volume',value:35});assert.equal(await home.executeJavaScript('document.querySelector("#qaMedia").volume'),.35);
+ await mediaActions.command({type:'seek',seconds:10});assert.ok(await home.executeJavaScript('document.querySelector("#qaMedia").currentTime>7'));
+ await mediaActions.command({type:'mute'});assert.equal(home.isAudioMuted(),true);
+ await mediaActions.command({type:'play'});assert.equal(await home.executeJavaScript('document.querySelector("#qaMedia").paused'),true);
+ console.log('[Controle] Reprodução, pausa, volume, avanço e silenciar passaram em mídia local de teste.');
+
+ await mobile.executeJavaScript('command({type:"key",key:"Escape"})');
+ await mobile.capturePage().then(image=>fs.writeFileSync('/tmp/roberttv-controle-celular.png',image.toPNG()));
+ await getRemote().stop();assert.equal(getRemote().info().enabled,false);console.log('[Controle] Desativação encerrou o servidor.');phone.close();
+};

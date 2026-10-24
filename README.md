@@ -80,4 +80,26 @@ Os builds usam uma lista explícita de arquivos públicos. `.runtime`, `.browser
 
 ## Licença e créditos
 
-Código sob MIT, com a atribuição ao Free My TV preservada. Veja [LICENSE](LICENSE) e [ASSET-CREDITS.md](ASSET-CREDITS.md). Marcas de streaming pertencem aos respectivos titulares. O controle pelo celular está fora do escopo desta versão.
+Código sob MIT, com a atribuição ao Free My TV preservada. Veja [LICENSE](LICENSE) e [ASSET-CREDITS.md](ASSET-CREDITS.md). Marcas de streaming pertencem aos respectivos titulares. O controle pelo celular é opcional e funciona diretamente pela rede local.
+
+
+## Controle pelo celular (Wi-Fi local)
+
+Em teste na branch `main` (0.2.0-beta.1). Os downloads da versão 0.1.1 ainda não incluem este recurso.
+
+Nas configurações, abra **Controle pelo celular** e clique em **Ativar controle por Wi-Fi**. Escaneie o QR Code com o celular na mesma rede, informe o código temporário e confirme a autorização no computador. Não é necessário Tailscale, conta adicional, servidor externo ou abrir portas no roteador.
+
+O servidor escuta somente no IPv4 privado da interface local selecionada automaticamente (porta 8788, ou uma das nove seguintes se ela estiver ocupada). Redes de convidados podem isolar os dispositivos. No Windows, se houver solicitação do firewall, permita apenas a rede privada; o aplicativo não altera o firewall.
+
+O controle oferece atalhos dos serviços, início/voltar, setas/OK, touchpad com cursor visível e toque para clicar, rolagem com dois dedos, teclado, play/pause, avanço de dez segundos, volume da mídia e silenciar o áudio do aplicativo. Volume e reprodução dependem de o player do serviço aceitar os comandos; o touchpad é a alternativa para operar seus próprios botões. Não controla outros programas, volume global do sistema, arquivos ou terminal.
+
+O código expira em cinco minutos, tem limite de tentativas e exige confirmação no desktop. Somente um controle é pareado por vez, por até oito horas ou até fechar o aplicativo. Há botões para desconectar o celular, regenerar o código e desativar o servidor. O pareamento usa cookie HttpOnly e SameSite; não inclui senhas de streaming. A conexão HTTP não é criptografada: use apenas uma rede local de confiança, sem encaminhar a porta para a internet.
+
+```bash
+npm test
+npm run desktop -- --verify-remote
+# Abrir diretamente o pareamento no computador:
+npm run desktop -- --remote
+```
+
+As verificações usam perfis separados. O teste nativo confirma o pareamento pela página móvel, navegação, touchpad e digitação, além de controles de mídia com um áudio de teste local. A reprodução de cada provedor ainda deve ser conferida pelo usuário.
