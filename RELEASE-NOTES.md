@@ -1,15 +1,16 @@
-Atualização **RobertTV Desktop v0.1.1**.
+**RobertTV Desktop v0.2.0-beta.1 — controle pelo celular no Wi-Fi**
 
-- Novo botão **Sobre** no topo, substituindo o atalho duplicado do YouTube.
-- Informações curtas sobre o aplicativo e sua licença de código aberto (MIT).
-- Crédito **Feito por Robert Lindomar**, com link para https://robertlindomar.com.br e para o código no GitHub.
-- O YouTube continua na faixa de aplicativos.
-- Os links da janela Sobre abrem no navegador padrão; os serviços continuam dentro do RobertTV.
+- Pareamento por QR Code e código temporário, com confirmação no computador.
+- Atalhos para os sete serviços, início, voltar, tela cheia, setas e OK.
+- Touchpad com cursor visível inclusive sobre modais; toque para clicar e faixa lateral de rolagem com um dedo.
+- Teclado do celular, play/pause, volume, silenciar e avanço/retorno de dez segundos. Os comandos de mídia dependem do player; o touchpad permite usar seus próprios botões.
+- Opção **Adicionar à tela inicial**, com ícone RobertTV e guia para iPhone/Android. No HTTP local, a opção manual do navegador é usada quando não há instalação automática disponível.
+- Pareamento restrito à rede local, um controle por vez, código com validade de cinco minutos e sessão de até oito horas. Pode ser revogado nas configurações.
 
-Os logins e a preferência de tema são preservados ao atualizar a versão distribuída: extraia o novo pacote em outra pasta e use o novo executável, mantendo a pasta de dados do usuário.
+**Linux x64:** extraia o `.tar.gz`, abra `RobertTV` e use `instalar-icone.sh` para adicionar ao menu.
 
-**Linux x64:** extraia o `.tar.gz` e execute `RobertTV`. Para adicionar ao menu, execute `instalar-icone.sh`.
+**Windows x64 — experimental:** extraia todo o ZIP e abra `RobertTV.exe`. Inicialização e interface verificadas em Windows. Reprodução protegida ainda não foi validada, e não há assinatura VMP de produção nem assinatura Authenticode.
 
-**Windows x64 — experimental:** extraia todo o ZIP e execute `RobertTV.exe`. A inicialização foi verificada em Windows; reprodução protegida ainda não foi validada e pode exigir assinatura VMP de produção, ainda ausente. O executável também não possui assinatura Authenticode.
+**Controle Wi-Fi:** ative em Configurações → Controle pelo celular; os dispositivos devem estar na mesma rede. Se o firewall bloquear, libere apenas a porta indicada na interface de rede privada. O aplicativo não abre portas no roteador nem altera o firewall. A comunicação HTTP não é criptografada: use somente redes locais de confiança.
 
-Cada pessoa entra nas próprias contas e precisa das assinaturas correspondentes. Os pacotes não incluem dados de login do autor.
+**Privacidade e atualização:** os pacotes não contêm logins, cookies ou perfis do autor. A versão distribuída mantém os dados na pasta do usuário, fora do programa; não apague essa pasta ao atualizar. Cada pessoa precisa das próprias contas/assinaturas. O primeiro acesso pelo atalho do celular pode pedir novo pareamento.
