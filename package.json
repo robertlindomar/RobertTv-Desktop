@@ -1,6 +1,6 @@
 {
   "name": "roberttv-pc",
-  "version": "0.2.0-beta.2",
+  "version": "0.2.0-beta.3",
   "private": true,
   "description": "Central de streaming desktop para Linux e Windows",
   "scripts": {

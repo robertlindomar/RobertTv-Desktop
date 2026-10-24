@@ -11,7 +11,7 @@ function createRemoteActions({getView,getPage,openService,home,fullscreen,servic
    const type=${JSON.stringify(type)},value=${JSON.stringify(value??null)};
    if(type==='play'){if(m.paused)await m.play();else m.pause();}
    if(type==='seek'){const end=Number.isFinite(m.duration)?Math.max(0,m.duration-.1):Infinity;m.currentTime=Math.max(0,Math.min(end,m.currentTime+value));}
-   if(type==='volume'){m.volume=value/100;m.muted=false;}
+   if(type==='volume'){const player=${JSON.stringify(getPage()==='youtube')}&&document.querySelector('#movie_player');if(typeof player?.setVolume==='function'){player.setVolume(value);player.unMute?.();}else{m.volume=value/100;m.muted=false;}}
    return{message:type==='play'?(m.paused?'Pausado':'Reproduzindo'):type==='seek'?'Posição ajustada': 'Volume ajustado'};
   })()`,true).catch(()=>({message:'Este player não aceitou o comando. Use o touchpad ou o teclado.'}));
  }
@@ -20,7 +20,7 @@ function createRemoteActions({getView,getPage,openService,home,fullscreen,servic
   async readState(){
    const wc=active().webContents;
    if(getPage()!=='home'){
-    const value=await wc.executeJavaScript('(()=>{const all=[...document.querySelectorAll("video,audio")];const m=all.find(v=>!v.paused)||all[0];return m?{volume:Math.round(m.volume*100),muted:m.muted}:null;})()').catch(()=>null);
+    const value=await wc.executeJavaScript(`(()=>{const player=${JSON.stringify(getPage()==='youtube')}&&document.querySelector('#movie_player');if(typeof player?.getVolume==='function')return{volume:player.getVolume(),muted:!!player.isMuted?.()};const all=[...document.querySelectorAll("video,audio")];const m=all.find(v=>!v.paused)||all[0];return m?{volume:Math.round(m.volume*100),muted:m.muted}:null;})()`).catch(()=>null);
     if(value)volume=value.volume;
     muted=wc.isAudioMuted()||!!value?.muted;
    }else muted=wc.isAudioMuted();

@@ -83,6 +83,15 @@ module.exports=async({win,homeView,remoteInfo,getRemote})=>{
  await mediaActions.command({type:'play'});assert.equal(await home.executeJavaScript('document.querySelector("#qaMedia").paused'),true);
  console.log('[Controle] Reprodução, pausa, volume, avanço e silenciar passaram em mídia local de teste.');
 
+ await home.executeJavaScript(`(()=>{const p=document.createElement('div');p.id='movie_player';let selected=35;p.getVolume=()=>selected;p.isMuted=()=>false;p.setVolume=value=>{selected=value;document.querySelector('#qaMedia').volume=value/200;};p.unMute=()=>{document.querySelector('#qaMedia').muted=false;};document.body.appendChild(p);})()`);
+ await mediaActions.command({type:'volume',value:70});
+ assert.equal(await home.executeJavaScript('document.querySelector("#movie_player").getVolume()'),70);
+ assert.equal(await home.executeJavaScript('document.querySelector("#qaMedia").volume'),.35);
+ assert.equal((await mediaActions.readState()).volume,70);
+ await home.executeJavaScript('document.querySelector("#movie_player").remove()');
+ console.log('[Controle] Volume do YouTube usa a API do player e mantém o nível selecionado mesmo com áudio normalizado.');
+
+
  await mobile.executeJavaScript('command({type:"key",key:"Escape"})');
  await mobile.capturePage().then(image=>fs.writeFileSync('/tmp/roberttv-controle-celular.png',image.toPNG()));
  await getRemote().stop();assert.equal(getRemote().info().enabled,false);console.log('[Controle] Desativação encerrou o servidor.');phone.close();

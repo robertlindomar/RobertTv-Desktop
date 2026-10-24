@@ -50,6 +50,7 @@ function createService(id){
 }
 async function openService(id,url){if(!Object.hasOwn(services,id))throw Error('Serviço inválido');if(url&&!allowed(id,url))throw Error('Destino inválido');const view=views.get(id)||createService(id);await show(view,id);if(!view.webContents.getURL()||url){failures.delete(id);await view.webContents.loadURL(url||services[id].url).catch(error=>{failures.set(id,{description:error.message});update('Falha de conexão. Use Recarregar para tentar novamente.');});}}
 function remoteInfo(){const info=remoteServer?.info()||{enabled:false,connected:false};if(info.enabled){const qr=qrcode(0,'M');qr.addData(info.url);qr.make();info.qr=qr.createDataURL(5,8);}return info;}
+function ensureRemoteServer(){if(!remoteServer)remoteServer=createRemoteServer({stateFile:verify?undefined:path.join(app.getPath('userData'),'remote-control.json'),host:verifyRemote?'127.0.0.1':undefined,onCommand:remoteActions.command,getState:remoteActions.readState,onChange:notifyRemote,confirmPairing:async name=>{if(verifyRemote)return true;const result=await dialog.showMessageBox(win,{type:'question',title:'Controle pelo celular',message:'Permitir que este celular controle o RobertTV?',detail:name+' poderá abrir serviços, navegar e controlar a reprodução somente neste aplicativo.',buttons:['Permitir','Recusar'],defaultId:1,cancelId:1});return result.response===0;}});return remoteServer;}
 function notifyRemote(){if(homeView&&!homeView.webContents.isDestroyed())homeView.webContents.send('remote:status',remoteInfo());}
 app.whenReady().then(async()=>{
  try{
@@ -63,7 +64,7 @@ app.whenReady().then(async()=>{
   ipcMain.handle('home:remote',async(event,command)=>{
    if(event.sender!==homeView.webContents||event.senderFrame?.url!==homeURL)throw Error('Origem inválida');
    if(command==='start'){
-    if(!remoteServer)remoteServer=createRemoteServer({host:verifyRemote?'127.0.0.1':undefined,onCommand:remoteActions.command,getState:remoteActions.readState,onChange:notifyRemote,confirmPairing:async name=>{if(verifyRemote)return true;const result=await dialog.showMessageBox(win,{type:'question',title:'Controle pelo celular',message:'Permitir que este celular controle o RobertTV?',detail:name+' poderá abrir serviços, navegar e controlar a reprodução somente neste aplicativo.',buttons:['Permitir','Recusar'],defaultId:1,cancelId:1});return result.response===0;}});
+    ensureRemoteServer();
     await remoteServer.start();
    }else if(command==='stop'){await remoteServer?.stop();remoteServer=null;}
    else if(command==='revoke')remoteServer?.revoke();
@@ -76,8 +77,9 @@ app.whenReady().then(async()=>{
   homeView.webContents.setWindowOpenHandler(({url})=>{const id=serviceForURL(url);if(id)openService(id,url).catch(console.error);return{action:'deny'};});
   homeView.webContents.on('will-navigate',(event,url)=>{if(url!==homeURL){event.preventDefault();const id=serviceForURL(url);if(id)openService(id,url).catch(console.error);}});
   await homeView.webContents.loadFile(path.join(root,'index.html'));await home();
+  if(!verify&&!smoke){try{await ensureRemoteServer().resume();}catch(error){console.error('[Controle] Não foi possível retomar o controle:',error.message);}}
   win.on('resize',layout);win.on('enter-full-screen',layout);win.on('leave-full-screen',layout);
-  win.on('closed',()=>{remoteServer?.stop().catch(()=>{});clearTimeout(revealTimer);for(const view of [homeView,controls,...views.values()])if(!view.webContents.isDestroyed())view.webContents.close();});
+  win.on('closed',()=>{remoteServer?.stop({preserveSession:!verify}).catch(()=>{});clearTimeout(revealTimer);for(const view of [homeView,controls,...views.values()])if(!view.webContents.isDestroyed())view.webContents.close();});
   if(smoke){const result=await homeView.webContents.executeJavaScript('({apps:document.querySelectorAll(".app").length,clock:!!document.querySelector("#clock-time"),themeSwitch:typeof actions.theme==="function"})');if(result.apps!==7||!result.clock||!components||!distributed||app.getPath('userData').startsWith(root+path.sep))throw Error('Pacote incompleto');console.log('[SMOKE OK]',JSON.stringify({packaged:distributed,dataOutsideBundle:!app.getPath('userData').startsWith(root+path.sep),...result}));app.quit();}
   else if(verifyRemote){try{await require('./verify-remote.cjs')({win,homeView,remoteActions,remoteInfo,getRemote:()=>remoteServer});app.quit();}catch(error){console.error(error);app.exit(1);}}
   else if(verify){try{await require('./verify-navigation.cjs')({win,homeView,controls,getView:id=>views.get(id),getPage:()=>page,failures,responses,services,all:process.argv.includes('--verify-services'),probe,reveal});app.quit();}catch(error){console.error('[Verificação]',error);app.exit(1);}}

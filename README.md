@@ -16,8 +16,8 @@ Os downloads ficam em **[Releases](https://github.com/robertlindomar/RobertTv-De
 
 | Sistema | Pacote | Estado |
 | --- | --- | --- |
-| Linux x64 | `RobertTV-Desktop-0.2.0-beta.2-linux-x64.tar.gz` | Sete serviços testados pelo autor em Omarchy/Arch Linux |
-| Windows x64 | `RobertTV-Desktop-0.2.0-beta.2-windows-x64.zip` | Experimental; sem validação de reprodução no Windows e sem assinatura VMP de produção |
+| Linux x64 | `RobertTV-Desktop-0.2.0-beta.3-linux-x64.tar.gz` | Sete serviços testados pelo autor em Omarchy/Arch Linux |
+| Windows x64 | `RobertTV-Desktop-0.2.0-beta.3-windows-x64.zip` | Experimental; sem validação de reprodução no Windows e sem assinatura VMP de produção |
 
 ### Linux
 
@@ -85,7 +85,7 @@ Código sob MIT, com a atribuição ao Free My TV preservada. Veja [LICENSE](LIC
 
 ## Controle pelo celular (Wi-Fi local)
 
-Disponível na versão 0.2.0-beta.2. O pareamento e o controle foram testados no Linux; a instalação no Windows continua experimental.
+Disponível na versão 0.2.0-beta.3. O pareamento e o controle foram testados no Linux; a instalação no Windows continua experimental.
 
 Nas configurações, abra **Controle pelo celular** e clique em **Ativar controle por Wi-Fi**. Escaneie o QR Code com o celular na mesma rede, informe o código temporário e confirme a autorização no computador. Não é necessário Tailscale, conta adicional, servidor externo ou abrir portas no roteador.
 
@@ -93,7 +93,7 @@ O servidor escuta somente no IPv4 privado da interface local selecionada automat
 
 O controle oferece atalhos dos serviços, início/voltar, setas/OK, touchpad com cursor visível e toque para clicar, rolagem com um dedo na faixa lateral direita ou com dois dedos no touchpad, teclado, play/pause, avanço de dez segundos, volume da mídia e silenciar o áudio do aplicativo. Volume e reprodução dependem de o player do serviço aceitar os comandos; o touchpad é a alternativa para operar seus próprios botões. Não controla outros programas, volume global do sistema, arquivos ou terminal.
 
-O código expira em cinco minutos, tem limite de tentativas e exige confirmação no desktop. Somente um controle é pareado por vez, por até oito horas ou até fechar o aplicativo. Há botões para desconectar o celular, regenerar o código e desativar o servidor. O pareamento usa cookie HttpOnly e SameSite; não inclui senhas de streaming. A conexão HTTP não é criptografada: use apenas uma rede local de confiança, sem encaminhar a porta para a internet.
+O código expira em cinco minutos, tem limite de tentativas e exige confirmação no desktop. Somente um controle é pareado por vez, por 24 horas, inclusive após fechar e reabrir o aplicativo. Há botões para desconectar o celular, regenerar o código e desativar o servidor. O pareamento usa cookie HttpOnly e SameSite; não inclui senhas de streaming. A conexão HTTP não é criptografada: use apenas uma rede local de confiança, sem encaminhar a porta para a internet.
 
 ```bash
 npm test

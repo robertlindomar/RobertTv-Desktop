@@ -1,4 +1,5 @@
 const http=require('node:http');
+const storage=require('node:fs');
 const os=require('node:os');
 const fs=require('node:fs/promises');
 const path=require('node:path');
@@ -6,6 +7,8 @@ const crypto=require('node:crypto');
 const {services}=require('./services.cjs');
 const root=path.resolve(__dirname,'..');
 const cookieName='roberttv_remote';
+const sessionTTL=24*60*60*1000;
+const digest=value=>crypto.createHash('sha256').update(value).digest('hex');
 const same=(a,b)=>typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&crypto.timingSafeEqual(Buffer.from(a),Buffer.from(b));
 function isLAN(ip){return /^192\.168\./.test(ip)||/^10\./.test(ip)||/^172\.(1[6-9]|2\d|3[01])\./.test(ip);}
 function addresses(){return Object.entries(os.networkInterfaces()).flatMap(([name,list])=>list.filter(n=>n.family==='IPv4'&&!n.internal&&isLAN(n.address)).map(n=>({name,address:n.address}))).sort((a,b)=>Number(/^192\.168/.test(b.address))-Number(/^192\.168/.test(a.address)));}
@@ -24,17 +27,21 @@ function validateCommand(c){
  default:return false;
  }
 }
-function createRemoteServer({onCommand,getState=()=>({}),confirmPairing=async()=>false,onChange=()=>{},host,port=8788,now=Date.now,pairTTL=300000}={}){
+function createRemoteServer({onCommand,getState=()=>({}),confirmPairing=async()=>false,onChange=()=>{},host,port=8788,now=Date.now,pairTTL=300000,stateFile}={}){
  if(typeof onCommand!=='function')throw Error('Executor de comandos obrigatório');
  let server,listenHost='',listenPort=0,code='',expiresAt=0,token='',sessionExpires=0,device='',pending=false,busy=false;
+ let saved=null;
+ if(stateFile){try{const value=JSON.parse(storage.readFileSync(stateFile,'utf8'));if(value.version===1&&typeof value.enabled==='boolean')saved=value;}catch(error){if(error.code!=='ENOENT'&&!(error instanceof SyntaxError))throw error;}}
+ if(saved?.enabled&&typeof saved.tokenHash==='string'&&/^[a-f0-9]{64}$/.test(saved.tokenHash)&&Number.isFinite(saved.sessionExpires)&&saved.sessionExpires>now()&&saved.sessionExpires<=now()+sessionTTL){token=saved.tokenHash;sessionExpires=saved.sessionExpires;device=typeof saved.device==='string'?saved.device.slice(0,40):'Celular';}
+ function persist(enabled=!!server?.listening){if(!stateFile)return;const data={version:1,enabled,address:listenHost,port:listenPort,tokenHash:token,sessionExpires,device};const temp=stateFile+'.tmp';storage.writeFileSync(temp,JSON.stringify(data),{mode:0o600});storage.chmodSync(temp,0o600);storage.renameSync(temp,stateFile);}
  const attempts=new Map(),rates=new Map();let queue=Promise.resolve();
- function info(){return {enabled:!!server?.listening,address:listenHost,port:listenPort,url:listenHost?`http://${listenHost}:${listenPort}`:'',code:token?'':code,expiresAt,connected:!!token&&now()<sessionExpires,device};}
+ function info(){if(token&&now()>=sessionExpires){token='';sessionExpires=0;device='';renew();persist();}return {enabled:!!server?.listening,address:listenHost,port:listenPort,url:listenHost?`http://${listenHost}:${listenPort}`:'',code:token?'':code,expiresAt,connected:!!token&&now()<sessionExpires,device};}
  function changed(){onChange(info());}
  function renew(){code=String(crypto.randomInt(100000,1000000));expiresAt=now()+pairTTL;attempts.clear();}
- function revoke(){token='';sessionExpires=0;device='';renew();changed();}
+ function revoke(){token='';sessionExpires=0;device='';renew();persist();changed();}
  function reply(res,status,data,headers={}){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...headers});res.end(JSON.stringify(data));}
  async function body(req){if(!String(req.headers['content-type']||'').startsWith('application/json'))throw Object.assign(Error('Envie JSON'),{status:415});let text='';for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>4096)throw Object.assign(Error('Mensagem muito grande'),{status:413});}try{return JSON.parse(text);}catch{throw Object.assign(Error('JSON inválido'),{status:400});}}
- function authenticated(req){const raw=String(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(cookieName+'='));return !!raw&&!!token&&now()<sessionExpires&&same(raw.slice(cookieName.length+1),token);}
+ function authenticated(req){const raw=String(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(cookieName+'='));return !!raw&&!!token&&now()<sessionExpires&&same(digest(raw.slice(cookieName.length+1)),token);}
  async function handle(req,res){
   try{
    const authority=`${listenHost}:${listenPort}`;
@@ -61,8 +68,8 @@ function createRemoteServer({onCommand,getState=()=>({}),confirmPairing=async()=
     try{accepted=await Promise.race([confirmPairing(name||'Celular'),new Promise(resolve=>{timer=setTimeout(()=>resolve(false),45000);})]);}finally{clearTimeout(timer);pending=false;}
     if(!server?.listening||!same(code,pairingCode))return reply(res,409,{error:'Pareamento cancelado. Tente novamente.'});
     if(!accepted){renew();changed();return reply(res,403,{error:'Conexão não autorizada no computador. Use o novo código.'});}
-    token=crypto.randomBytes(32).toString('hex');device=name||'Celular';sessionExpires=now()+8*60*60*1000;code='';attempts.clear();changed();
-    return reply(res,200,{ok:true},{'Set-Cookie':`${cookieName}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800`});
+    const sessionToken=crypto.randomBytes(32).toString('hex');token=digest(sessionToken);device=name||'Celular';sessionExpires=now()+sessionTTL;code='';attempts.clear();try{persist();}catch(error){token='';sessionExpires=0;device='';renew();throw error;}changed();
+    return reply(res,200,{ok:true},{'Set-Cookie':`${cookieName}=${sessionToken}; HttpOnly; SameSite=Strict; Path=/; Max-Age=86400`});
    }
    if(!authenticated(req))return reply(res,401,{error:'Pareie este celular no computador.'});
    if(req.method==='GET'&&url.pathname==='/api/state')return reply(res,200,{connected:true,device,...await getState()});
@@ -81,10 +88,12 @@ function createRemoteServer({onCommand,getState=()=>({}),confirmPairing=async()=
  }
  return{
   info,revoke,
-  async start(){if(server?.listening)return info();listenHost=host||addresses()[0]?.address;if(!listenHost)throw Error('Conecte o computador ao Wi-Fi ou à rede local antes de ativar.');if(listenHost!=='127.0.0.1'&&!isLAN(listenHost))throw Error('Interface local inválida');renew();server=http.createServer(handle);server.requestTimeout=60000;server.headersTimeout=10000;server.maxConnections=12;
-   for(let candidate=port;candidate<port+10;candidate++){try{await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(candidate,listenHost,()=>{server.removeListener('error',reject);resolve();});});listenPort=server.address().port;changed();return info();}catch(error){if(error.code!=='EADDRINUSE'||candidate===port+9){server=null;throw error;}}}
+  async resume(){if(saved?.enabled)return this.start();return info();},
+  async start(){if(server?.listening)return info();const available=addresses();listenHost=host||(available.some(n=>n.address===saved?.address)?saved.address:available[0]?.address);if(!listenHost)throw Error('Conecte o computador ao Wi-Fi ou à rede local antes de ativar.');if(listenHost!=='127.0.0.1'&&!isLAN(listenHost))throw Error('Interface local inválida');renew();server=http.createServer(handle);server.requestTimeout=60000;server.headersTimeout=10000;server.maxConnections=12;
+   const firstPort=Number.isInteger(saved?.port)&&saved.port>0&&saved.port<65526?saved.port:port;
+   for(let candidate=firstPort;candidate<firstPort+10;candidate++){try{await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(candidate,listenHost,()=>{server.removeListener('error',reject);resolve();});});listenPort=server.address().port;persist();changed();return info();}catch(error){if(error.code!=='EADDRINUSE'||candidate===firstPort+9){if(server?.listening){server.closeAllConnections();server.close();}server=null;throw error;}}}
   },
-  async stop(){token='';code='';device='';expiresAt=0;sessionExpires=0;if(server){const old=server;server=null;old.closeAllConnections();await new Promise(resolve=>old.close(resolve));}changed();}
+  async stop({preserveSession=false}={}){if(preserveSession)persist(!!server?.listening);else{token='';code='';device='';expiresAt=0;sessionExpires=0;persist(false);}if(server){const old=server;server=null;old.closeAllConnections();await new Promise(resolve=>old.close(resolve));}changed();}
  };
 }
 module.exports={createRemoteServer,validateCommand,addresses,isLAN};

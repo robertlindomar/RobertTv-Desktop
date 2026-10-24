@@ -1,5 +1,7 @@
-**RobertTV Desktop v0.2.0-beta.2 — correção do touchpad em tela cheia**
+**RobertTV Desktop v0.2.0-beta.3 — controle por 24 horas e volume do YouTube**
 
+- Pareamento do controle mantido por 24 horas e retomado após fechar e reabrir o aplicativo.
+- Volume do YouTube sincronizado pela API do player para evitar restaurar um nível anterior após ajustes pelo celular.
 - Corrigido o cursor do controle pelo celular que ficava escondido ao abrir o YouTube em tela cheia.
 - Verificação visual automatizada do cursor e de cliques ao entrar e sair da tela cheia.
 
@@ -8,7 +10,7 @@
 - Touchpad com cursor visível inclusive sobre modais; toque para clicar e faixa lateral de rolagem com um dedo.
 - Teclado do celular, play/pause, volume, silenciar e avanço/retorno de dez segundos. Os comandos de mídia dependem do player; o touchpad permite usar seus próprios botões.
 - Opção **Adicionar à tela inicial**, com ícone RobertTV e guia para iPhone/Android. No HTTP local, a opção manual do navegador é usada quando não há instalação automática disponível.
-- Pareamento restrito à rede local, um controle por vez, código com validade de cinco minutos e sessão de até oito horas. Pode ser revogado nas configurações.
+- Pareamento restrito à rede local, um controle por vez, código com validade de cinco minutos e sessão de 24 horas, retomada após reiniciar o aplicativo. Pode ser revogado nas configurações.
 
 **Linux x64:** extraia o `.tar.gz`, abra `RobertTV` e use `instalar-icone.sh` para adicionar ao menu.
 
