@@ -12,7 +12,13 @@ module.exports=async({win,homeView,remoteInfo,getRemote})=>{
  await until(()=>getRemote()?.info().enabled);
  const info=remoteInfo();assert.ok(info.qr.startsWith('data:image/'));assert.equal(info.address,'127.0.0.1');
  const phone=new BrowserWindow({width:390,height:844,show:true,webPreferences:{nodeIntegration:false,contextIsolation:true,sandbox:true,partition:'remote-qa-'+Date.now()}});
- const mobile=phone.webContents;await phone.loadURL(info.url);assert.equal(await mobile.executeJavaScript('document.documentElement.scrollWidth<=innerWidth'),true);
+ const mobile=phone.webContents;mobile.setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1');await phone.loadURL(info.url);assert.equal(await mobile.executeJavaScript('document.documentElement.scrollWidth<=innerWidth'),true);
+ await mobile.executeJavaScript('document.querySelector("#install-button").click()');
+ assert.equal(await mobile.executeJavaScript('document.querySelector("#install-help").open'),true);
+ assert.ok(await mobile.executeJavaScript('document.querySelector("#install-steps").textContent.includes("Safari")'));
+ assert.ok(await mobile.executeJavaScript('document.querySelector("#install-steps").textContent.includes("Adicionar à Tela de Início")'));
+ await mobile.executeJavaScript('document.querySelector("#install-done").click()');
+ console.log('[Controle] Instruções de atalho para iPhone abriram e fecharam normalmente.');
  await mobile.executeJavaScript(`document.querySelector('#pair-code').value=${JSON.stringify(info.code)};document.querySelector('#device-name').value='Celular de teste';document.querySelector('#pair-form').requestSubmit()`);
  await until(()=>mobile.executeJavaScript('!document.querySelector("#control-screen").hidden'));
  assert.equal(getRemote().info().connected,true);console.log('[Controle] Pareamento real da interface móvel passou.');

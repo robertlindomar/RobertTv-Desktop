@@ -18,3 +18,35 @@ pad.addEventListener('touchcancel',()=>{lastGesture=null;scrollDelta=0;moves={dx
 setInterval(async()=>{if(sending||!connected||(!moves.dx&&!moves.dy&&!scrollDelta))return;const data=scrollDelta?{type:'scroll',dy:Math.round(scrollDelta)}:{type:'pointer',...moves};if(scrollDelta)scrollDelta=0;else moves={dx:0,dy:0};sending=true;try{await command(data,true);}finally{sending=false;}},40);
 async function poll(){if(polling)return;polling=true;try{const state=await request('/api/state');setConnected(true);document.body.classList.remove('offline');apply(state);}catch(error){if(connected){document.body.classList.add('offline');$('#connection').textContent='Reconectando…';}else setConnected(false);}finally{polling=false;}}
 setInterval(()=>{if(!document.hidden)poll();},2500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll();});poll();
+
+let installPrompt=null;
+const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+function updateInstallCard(){const standalone=isStandalone();$('#install-card').hidden=standalone;if(standalone&&$('#install-help').open)$('#install-help').close();}
+window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;updateInstallCard();});
+window.addEventListener('appinstalled',()=>{installPrompt=null;$('#install-card').hidden=true;$('#install-help').close();});
+window.matchMedia('(display-mode: standalone)').addEventListener('change',updateInstallCard);
+$('#install-button').addEventListener('click',async()=>{
+ if(installPrompt){const prompt=installPrompt;installPrompt=null;await prompt.prompt();await prompt.userChoice;return;}
+ const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ const android=/Android/i.test(navigator.userAgent);
+ const iosOther=ios&&/CriOS|FxiOS|EdgiOS/i.test(navigator.userAgent);
+ const steps=ios?[
+  iosOther?'Abra esta página no Safari para adicionar o controle.':'No Safari, abra o menu e toque em Compartilhar (quadrado com seta para cima).',
+  'Escolha “Adicionar à Tela de Início”.',
+  'Se aparecer, ative “Abrir como App da Web”. Mantenha o nome RobertTV e toque em “Adicionar”.'
+ ]:android?[
+  'Abra o menu do navegador (⋮), no canto superior.',
+  'Toque em “Adicionar à tela inicial” ou “Instalar app”, conforme a opção disponível.',
+  'Confirme o nome RobertTV e toque em “Adicionar” ou “Instalar”.'
+ ]:[
+  'Abra este mesmo endereço no navegador do celular.',
+  'No menu do navegador, escolha “Adicionar à tela inicial”.',
+  'Confirme para criar o ícone RobertTV.'
+ ];
+ $('#install-intro').textContent='Abra o controle como um app, direto pelo ícone do RobertTV.';
+ $('#install-steps').replaceChildren(...steps.map(text=>{const li=document.createElement('li');li.textContent=text;return li;}));
+ $('#install-help').showModal();
+});
+$('#install-close').addEventListener('click',()=>$('#install-help').close());$('#install-done').addEventListener('click',()=>$('#install-help').close());
+$('#install-help').addEventListener('click',event=>{if(event.target!==$('#install-help'))return;const r=event.target.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)event.target.close();});
+updateInstallCard();

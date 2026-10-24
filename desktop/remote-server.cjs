@@ -43,7 +43,7 @@ function createRemoteServer({onCommand,getState=()=>({}),confirmPairing=async()=
    const ip=req.socket.remoteAddress||'';if(ip!=='127.0.0.1'&&ip!=='::1'&&!isLAN(ip.replace(/^::ffff:/,'')))return reply(res,403,{error:'Somente rede local'});
    const url=new URL(req.url,`http://${authority}`);
    if(req.method==='GET'&&!url.pathname.startsWith('/api/')){
-    const files={'/':['remote/index.html','text/html; charset=utf-8'],'/remote.css':['remote/remote.css','text/css'],'/remote.js':['remote/remote.js','text/javascript'],'/logo.svg':['assets/logo.svg','image/svg+xml']};
+    const files={'/':['remote/index.html','text/html; charset=utf-8'],'/remote.css':['remote/remote.css','text/css'],'/remote.js':['remote/remote.js','text/javascript'],'/logo.svg':['assets/logo.svg','image/svg+xml'],'/manifest.webmanifest':['remote/manifest.webmanifest','application/manifest+json'],'/icon-192.png':['remote/icon-192.png','image/png'],'/icon-512.png':['remote/icon-512.png','image/png'],'/apple-touch-icon.png':['remote/apple-touch-icon.png','image/png']};
     const icon=/^\/icons\/(netflix|youtube|prime|disney|hbo|paramount|globo)$/.exec(url.pathname);
     if(icon){const icons={netflix:'netflix.svg',youtube:'youtube.png',prime:'prime.png',disney:'disneyplus.svg',hbo:'hbomax.svg',paramount:'paramountplus.svg',globo:'globoplay.svg'};const f=icons[icon[1]];files[url.pathname]=['assets/'+f,f.endsWith('png')?'image/png':'image/svg+xml'];}
     const entry=files[url.pathname];if(!entry)return reply(res,404,{error:'Não encontrado'});

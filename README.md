@@ -103,3 +103,10 @@ npm run desktop -- --remote
 ```
 
 As verificações usam perfis separados. O teste nativo confirma o pareamento pela página móvel, navegação, touchpad e digitação, além de controles de mídia com um áudio de teste local. A reprodução de cada provedor ainda deve ser conferida pelo usuário.
+
+
+### Ícone do controle na tela inicial do celular
+
+Na página do controle, toque em **Adicionar** no cartão “Seu controle, a um toque”. O assistente mostra os passos conforme o aparelho. No Safari do iPhone, use Compartilhar → Adicionar à Tela de Início e, se disponível, Abrir como App da Web. No Android, use o menu do navegador → Adicionar à tela inicial; o nome da opção pode variar.
+
+O controle fornece nome, ícones e manifesto com modo standalone. A instalação automática de PWA depende das regras do navegador e normalmente exige HTTPS; no endereço HTTP da rede local oferecemos o atalho manual. Não registramos service worker nem prometemos uso offline: o computador precisa estar ligado e com o controle ativo. Ao abrir pelo ícone pela primeira vez, o navegador pode usar uma sessão separada e pedir um novo pareamento. Se o endereço IP do computador mudar, será necessário atualizar o atalho.
