@@ -11,3 +11,8 @@ diagnostics/
 *.pem
 *.pfx
 *.p12
+
+# Configuração pessoal de memória e skills locais
+.ai-memory.toml
+.agents/
+AGENTS.md.bak-*
