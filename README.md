@@ -2,7 +2,13 @@
 
 Uma central de streaming para o seu computador, com relógio, data e os seus serviços em uma única janela. Interface em português, temas claro e escuro e navegação por teclado. Feito por [Robert Lindomar](https://robertlindomar.com.br).
 
-![Tela inicial do RobertTV](docs/tela-inicial.png)
+**Tema claro**
+
+![RobertTV Desktop — tema claro](docs/RobertTV-Desktop-Claro.png)
+
+**Tema escuro**
+
+![RobertTV Desktop — tema escuro](docs/RobertTV-Desktop-escuro.png)
 
 ## Baixar
 
