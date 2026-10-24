@@ -41,7 +41,11 @@ function createRemoteActions({getView,getPage,openService,home,fullscreen,servic
     wc.sendInputEvent({type:'mouseMove',x:point.x,y:point.y});
     await wc.executeJavaScript(`(()=>{
      let p=document.getElementById('__robertRemotePointer');
-     if(!p){p=document.createElement('div');p.id='__robertRemotePointer';p.setAttribute('aria-hidden','true');p.setAttribute('popover','manual');p.style.cssText='position:fixed;inset:auto;margin:0;padding:0;width:15px;height:15px;border:2px solid white;border-radius:50%;background:#9d8be0;box-shadow:0 1px 5px #0009;pointer-events:none;z-index:2147483647;transform:translate(-50%,-50%)';}
+     if(!p){p=document.createElement('div');p.id='__robertRemotePointer';p.setAttribute('aria-hidden','true');p.setAttribute('popover','manual');p.style.cssText='position:fixed;inset:auto;margin:0;padding:0;width:15px;height:15px;border:2px solid white;border-radius:50%;background:#9d8be0;box-shadow:0 1px 5px #0009;pointer-events:none;z-index:2147483647;transform:translate(-50%,-50%)';
+      // Fullscreen can promote the same parent (YouTube uses the document root)
+      // above an already open popover. Reopen it to restore its top-layer order.
+      document.addEventListener('fullscreenchange',()=>{if(p.isConnected){if(p.matches(':popover-open'))p.hidePopover();p.showPopover();}});
+     }
      const layer=document.querySelector('dialog[open]')||(document.fullscreenElement?.tagName!=='VIDEO'&&document.fullscreenElement)||document.documentElement;
      if(p.parentElement!==layer){if(p.matches(':popover-open'))p.hidePopover();layer.appendChild(p);}
      p.style.left='${point.x}px';p.style.top='${point.y}px';if(!p.matches(':popover-open'))p.showPopover();

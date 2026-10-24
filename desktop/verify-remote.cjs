@@ -45,6 +45,28 @@ module.exports=async({win,homeView,remoteInfo,getRemote})=>{
  assert.equal(await home.executeJavaScript('document.querySelector("#modal").open'),false);
  console.log('[Controle] Cursor visível sobre a modal, interruptor e fechar funcionaram pelo touchpad.');
 
+ // YouTube makes the document root fullscreen. The pointer's parent stays the
+ // same, so checking only its parent or :popover-open misses a hidden cursor.
+ await home.executeJavaScript(`(()=>{const b=document.createElement('button');b.id='qaFullscreenButton';b.textContent='Teste de clique';b.style.cssText='position:fixed;left:250px;top:250px;width:100px;height:100px;z-index:2147483646';b.onclick=()=>b.dataset.clicked='true';document.body.appendChild(b);})()`);
+ await moveTo({x:300,y:300});
+ async function assertPointerPainted(){
+  const point=await home.executeJavaScript('(()=>{const r=document.querySelector("#__robertRemotePointer").getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2};})()');
+  const shot=await home.capturePage({x:Math.round(point.x),y:Math.round(point.y),width:1,height:1});
+  const pixel=shot.toBitmap();assert.deepEqual([...pixel.subarray(0,3)],[224,139,157],'Cursor deve estar visível acima do player em tela cheia');
+ }
+ await home.executeJavaScript('document.documentElement.requestFullscreen()',true);
+ await until(()=>home.executeJavaScript('document.fullscreenElement===document.documentElement'));
+ await pause(300);await assertPointerPainted();
+ await mobile.executeJavaScript('command({type:"pointer",dx:1,dy:1})');cursor={x:cursor.x+2,y:cursor.y+2};
+ await assertPointerPainted();
+ await mobile.executeJavaScript('command({type:"click"})');
+ await until(()=>home.executeJavaScript('document.querySelector("#qaFullscreenButton").dataset.clicked==="true"'));
+ await home.executeJavaScript('document.exitFullscreen()');
+ await until(()=>home.executeJavaScript('!document.fullscreenElement'));
+ await pause(300);await assertPointerPainted();
+ await home.executeJavaScript('document.querySelector("#qaFullscreenButton").remove()');
+ console.log('[Controle] Cursor permaneceu visível ao entrar/sair de tela cheia e clique no player funcionou.');
+
  await home.executeJavaScript('const field=document.createElement("input");field.id="qaRemoteInput";field.style.cssText="position:fixed;top:90px;left:200px;z-index:999";document.body.appendChild(field);field.focus()');
  await mobile.executeJavaScript('command({type:"text",text:"RobertTV"})');
  assert.equal(await home.executeJavaScript('document.querySelector("#qaRemoteInput").value'),'RobertTV');

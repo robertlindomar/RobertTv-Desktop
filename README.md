@@ -16,8 +16,8 @@ Os downloads ficam em **[Releases](https://github.com/robertlindomar/RobertTv-De
 
 | Sistema | Pacote | Estado |
 | --- | --- | --- |
-| Linux x64 | `RobertTV-Desktop-0.2.0-beta.1-linux-x64.tar.gz` | Sete serviços testados pelo autor em Omarchy/Arch Linux |
-| Windows x64 | `RobertTV-Desktop-0.2.0-beta.1-windows-x64.zip` | Experimental; sem validação de reprodução no Windows e sem assinatura VMP de produção |
+| Linux x64 | `RobertTV-Desktop-0.2.0-beta.2-linux-x64.tar.gz` | Sete serviços testados pelo autor em Omarchy/Arch Linux |
+| Windows x64 | `RobertTV-Desktop-0.2.0-beta.2-windows-x64.zip` | Experimental; sem validação de reprodução no Windows e sem assinatura VMP de produção |
 
 ### Linux
 
@@ -85,7 +85,7 @@ Código sob MIT, com a atribuição ao Free My TV preservada. Veja [LICENSE](LIC
 
 ## Controle pelo celular (Wi-Fi local)
 
-Disponível na versão 0.2.0-beta.1. O pareamento e o controle foram testados no Linux; a instalação no Windows continua experimental.
+Disponível na versão 0.2.0-beta.2. O pareamento e o controle foram testados no Linux; a instalação no Windows continua experimental.
 
 Nas configurações, abra **Controle pelo celular** e clique em **Ativar controle por Wi-Fi**. Escaneie o QR Code com o celular na mesma rede, informe o código temporário e confirme a autorização no computador. Não é necessário Tailscale, conta adicional, servidor externo ou abrir portas no roteador.
 

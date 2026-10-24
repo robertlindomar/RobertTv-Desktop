@@ -1,4 +1,7 @@
-**RobertTV Desktop v0.2.0-beta.1 — controle pelo celular no Wi-Fi**
+**RobertTV Desktop v0.2.0-beta.2 — correção do touchpad em tela cheia**
+
+- Corrigido o cursor do controle pelo celular que ficava escondido ao abrir o YouTube em tela cheia.
+- Verificação visual automatizada do cursor e de cliques ao entrar e sair da tela cheia.
 
 - Pareamento por QR Code e código temporário, com confirmação no computador.
 - Atalhos para os sete serviços, início, voltar, tela cheia, setas e OK.
